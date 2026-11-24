@@ -1,0 +1,21 @@
+# Normalize line endings in the repository, use the platform default on checkout.
+* text=auto
+
+# Source and build files: force LF in the repository.
+*.c      text eol=lf
+*.h      text eol=lf
+*.S      text eol=lf
+*.s      text eol=lf
+*.ld     text eol=lf
+*.md     text eol=lf
+Makefile text eol=lf
+*.mk     text eol=lf
+*.yml    text eol=lf
+*.json   text eol=lf
+
+# Binary artifacts (never converted).
+*.bin    binary
+*.hex    binary
+*.elf    binary
+*.o      binary
+*.a      binary

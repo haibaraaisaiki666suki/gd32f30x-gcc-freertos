@@ -1,0 +1,22 @@
+{
+  "version": 4,
+  "configurations": [
+    {
+      "name": "GD32F303VC",
+      "intelliSenseMode": "gcc-arm",
+      "cStandard": "gnu99",
+      "defines": [
+        "USE_STDPERIPH_DRIVER",
+        "GD32F30X_HD"
+      ],
+      "includePath": [
+        "${workspaceFolder}/GD32F30x/CMSIS",
+        "${workspaceFolder}/GD32F30x/CMSIS/GD/GD32F30x/Include",
+        "${workspaceFolder}/GD32F30x/GD32F30x_standard_peripheral/Include",
+        "${workspaceFolder}/FREERTOS/include",
+        "${workspaceFolder}/FREERTOS/portable/GCC/ARM_CM4F",
+        "${workspaceFolder}/User"
+      ]
+    }
+  ]
+}

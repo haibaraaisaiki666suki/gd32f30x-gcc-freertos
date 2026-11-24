@@ -1,0 +1,29 @@
+# 下载的 CMSIS-Pack 与本地解出的 SVD（按 README 获取，不入库）
+packs/*.pack
+packs/*.part
+svd/
+
+# Build output
+build/
+*.o
+*.d
+*.elf
+__pycache__/
+*.pyc
+*.hex
+*.bin
+*.map
+*.lst
+
+# Editor / OS
+# VSCode：只追踪可移植的工程级配置，个人设置留在本地
+.vscode/*
+!.vscode/tasks.json
+!.vscode/c_cpp_properties.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.swp
+*~
+Thumbs.db
+.DS_Store

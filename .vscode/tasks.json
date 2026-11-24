@@ -1,0 +1,104 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "type": "shell",
+      "command": "make",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "windows": {
+        "command": "mingw32-make",
+        "options": {
+          "cwd": "${workspaceFolder}",
+          "shell": {
+            "executable": "${env:ProgramFiles}\\Git\\bin\\bash.exe",
+            "args": ["-c"]
+          }
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "rebuild",
+      "type": "shell",
+      "command": "make clean && make",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "windows": {
+        "command": "mingw32-make clean && mingw32-make",
+        "options": {
+          "cwd": "${workspaceFolder}",
+          "shell": {
+            "executable": "${env:ProgramFiles}\\Git\\bin\\bash.exe",
+            "args": ["-c"]
+          }
+        }
+      },
+      "group": "build",
+      "problemMatcher": ["$gcc"],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      }
+    },
+    {
+      "label": "clean",
+      "type": "shell",
+      "command": "make clean",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "windows": {
+        "command": "mingw32-make clean",
+        "options": {
+          "cwd": "${workspaceFolder}",
+          "shell": {
+            "executable": "${env:ProgramFiles}\\Git\\bin\\bash.exe",
+            "args": ["-c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "size",
+      "type": "shell",
+      "command": "make size",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "windows": {
+        "command": "mingw32-make size",
+        "options": {
+          "cwd": "${workspaceFolder}",
+          "shell": {
+            "executable": "${env:ProgramFiles}\\Git\\bin\\bash.exe",
+            "args": ["-c"]
+          }
+        }
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    }
+  ]
+}
