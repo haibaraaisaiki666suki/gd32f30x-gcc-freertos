@@ -79,9 +79,33 @@
    更新的版本（如 14.x）通常也能编译；安装 Arm 版不方便时，也可使用便携版
    [xPack ARM Embedded GCC](https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases)。
 
-2. **GNU Make**
-   - Linux / macOS：系统自带 `make`
-   - Windows：MSYS2 的 `make`，或单独安装的 `mingw32-make`（命令写作 `mingw32-make`）
+2. **GNU Make**（3.81 及以上；本工程实测 4.2.1）
+
+   - Linux
+     - Debian / Ubuntu：`sudo apt install make`（或 `build-essential`）
+     - Fedora / RHEL：`sudo dnf install make`
+     - Arch：`sudo pacman -S make`
+   - macOS：`xcode-select --install` 自带的 GNU Make 即可；用 Homebrew 装新版时
+     执行 `brew install make`，命令名为 `gmake`
+   - Windows：任选一种，装完重开终端
+     - **MSYS2（推荐）**：从 <https://www.msys2.org/> 安装，在 MSYS2 终端执行
+       `pacman -S mingw-w64-ucrt-x86_64-make`，再把 `C:\msys64\ucrt64\bin` 加入
+       `PATH`；命令名是 `mingw32-make`
+     - **独立 MinGW-w64 发行版**：如 [WinLibs](https://winlibs.com/) 的 zip，
+       自带 `mingw32-make.exe`，解压后把其中的 `bin` 目录加入 `PATH`
+     - **Chocolatey**：`choco install make`（GnuWin32 版为 3.81，可用但不再更新）
+
+   Git for Windows 只提供 Shell，不带 `make`，需要按上面的方法单独安装。
+
+   确认安装：
+
+   ```bash
+   make --version           # Linux / macOS
+   mingw32-make --version   # Windows
+   ```
+
+   Windows 上如果装到的可执行文件叫 `make.exe`，把下文命令中的 `mingw32-make`
+   换成 `make` 即可。
 
 3. **烧录与调试工具（可选）**
    - `pyocd`、`openocd`、J-Link 均可；本工程只产出固件，不绑定具体调试器。

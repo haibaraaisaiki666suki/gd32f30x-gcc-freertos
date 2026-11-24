@@ -80,9 +80,35 @@ Third-party library files are taken verbatim from the official repositories and 
    Newer versions (such as 14.x) usually build too; if installing the Arm build is inconvenient, the portable
    [xPack ARM Embedded GCC](https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack/releases) can be used instead.
 
-2. **GNU Make**
-   - Linux / macOS: the system `make`
-   - Windows: MSYS2's `make`, or a standalone `mingw32-make` (command written as `mingw32-make`)
+2. **GNU Make** (3.81 or later; tested with 4.2.1 in this project)
+
+   - Linux
+     - Debian / Ubuntu: `sudo apt install make` (or `build-essential`)
+     - Fedora / RHEL: `sudo dnf install make`
+     - Arch: `sudo pacman -S make`
+   - macOS: the GNU Make bundled with `xcode-select --install` works; to get a newer
+     version via Homebrew run `brew install make` (the command is then `gmake`)
+   - Windows: pick one, then reopen the terminal
+     - **MSYS2 (recommended)**: install from <https://www.msys2.org/>, run
+       `pacman -S mingw-w64-ucrt-x86_64-make` in an MSYS2 terminal, then add
+       `C:\msys64\ucrt64\bin` to `PATH`; the command is `mingw32-make`
+     - **Standalone MinGW-w64 distribution**: e.g. the [WinLibs](https://winlibs.com/)
+       zip ships `mingw32-make.exe`; extract it and add its `bin` directory to `PATH`
+     - **Chocolatey**: `choco install make` (the GnuWin32 build is 3.81; usable but no
+       longer updated)
+
+   Git for Windows only provides a shell and does not include `make`; install it
+   separately using one of the methods above.
+
+   Verify the installation:
+
+   ```bash
+   make --version           # Linux / macOS
+   mingw32-make --version   # Windows
+   ```
+
+   On Windows, if the installed executable is named `make.exe`, use `make` instead of
+   `mingw32-make` in the commands below.
 
 3. **Flashing and debugging tools (optional)**
    - `pyocd`, `openocd` or J-Link all work; this project only produces firmware and is not tied to a specific debugger.
