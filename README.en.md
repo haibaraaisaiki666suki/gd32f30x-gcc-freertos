@@ -2,6 +2,8 @@
 
 # GD32F30x GCC + FreeRTOS Baseline Project
 
+[![Build](https://github.com/haibaraaisaiki666suki/gd32f30x-gcc-freertos/actions/workflows/build.yml/badge.svg)](https://github.com/haibaraaisaiki666suki/gd32f30x-gcc-freertos/actions/workflows/build.yml)
+
 A minimal buildable project that depends on no IDE: **GD32F30x official standard peripheral library V3.0.3 + FreeRTOS-Kernel V10.5.1**, built with arm-none-eabi-gcc + GNU Make to produce .elf / .hex / .bin.
 
 **Optional enhancements**: VSCode, device pack scripts, flashing and debugging — see [Optional Extensions](#optional-extensions-not-required-to-build) at the end. If you don't need them, you can delete the docs/ tools/ packs/ svd/ .vscode/ folders.

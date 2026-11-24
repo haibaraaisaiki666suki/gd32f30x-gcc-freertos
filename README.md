@@ -2,6 +2,8 @@
 
 # GD32F30x GCC + FreeRTOS 基线工程
 
+[![Build](https://github.com/haibaraaisaiki666suki/gd32f30x-gcc-freertos/actions/workflows/build.yml/badge.svg)](https://github.com/haibaraaisaiki666suki/gd32f30x-gcc-freertos/actions/workflows/build.yml)
+
 一个不依赖任何 IDE 的最小可编译工程：**GD32F30x 官方标准外设库 V3.0.3 + FreeRTOS-Kernel V10.5.1**，用 arm-none-eabi-gcc + GNU Make 构建，生成 .elf / .hex / .bin。
 
 **可选增强**：VSCode、器件包脚本、烧录调试，见文末[可选扩展](#可选扩展非构建必需)。如不需要可删去 docs/ tools/ packs/ svd/ .vscode/ 文件夹。
