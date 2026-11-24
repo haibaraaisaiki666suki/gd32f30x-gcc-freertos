@@ -3,12 +3,12 @@
 # Optional: VSCode Programming and Debugging Platform
 
 > **Optional content**: this page collects the VSCode project configuration, device packs, flashing/debugging and device switching scripts.
-> Firmware building only depends on `arm-none-eabi-gcc` + GNU Make; `.vscode/`, `tools/`, `packs/` and `svd/`
-> do not participate in `make`, and deleting or skipping them does not affect the firmware artifacts.
 >
-> For the manual device-switching flow that needs neither VSCode nor scripts, see
-> [the README's "Switching MCU / Board (Manual)"](../README.en.md#switching-mcu--board-manual).
-> Neither `packs/` nor `svd/` is checked in, and neither should be forwarded in the project archive.
+> Firmware building only depends on arm-none-eabi-gcc + GNU Make; .vscode/, tools/, packs/ and svd/ do not participate in make, and deleting or skipping them does not affect the firmware artifacts.
+>
+> For the manual device-switching flow that needs neither VSCode nor scripts, see [the README's "Switching MCU / Board (Manual)"](../README.en.md#switching-mcu--board-manual).
+>
+> Neither packs/ nor svd/ is checked in, and neither should be forwarded in the project archive.
 
 ## Environment Setup
 
@@ -18,7 +18,7 @@ Using the VSCode platform described on this page to build, flash and debug requi
 |------|---------|-------|
 | ARM GNU Toolchain | Cross-compilation | See [README's Environment Setup](../README.en.md#environment-setup) |
 | GNU Make | Build | See [README's Environment Setup](../README.en.md#environment-setup) |
-| Python 3.8+ | Run the `.py` scripts in `tools/` | The command may be `python` or `python3`; throughout this page we write `python` |
+| Python 3.8+ | Run the .py scripts under tools/ | The command may be `python` or `python3`; throughout this page we write `python` |
 | pyOCD | Flashing and debugging | Installed via Python, see the command below |
 | VSCode | Editor | The main editing and debugging window |
 | ms-vscode.cpptools | C/C++ language support | A VSCode extension (plugin) |
@@ -26,7 +26,7 @@ Using the VSCode platform described on this page to build, flash and debug requi
 | Git for Windows | Conveniently run make build tasks (Windows only) | VSCode for Windows often fails to detect environment variables in the default terminal; use the bash bundled with Git instead |
 | curl | Manually download the device pack (optional) | Used when not downloading via script, see "Manually downloading the pack" |
 
-Hardware: a PWLINK2 debug probe (CMSIS-DAP compatible, recognized directly by pyOCD).
+Hardware: this project uses a PWLINK2 debug probe (CMSIS-DAP compatible, recognized directly by pyOCD).
 
 ### Installation
 
@@ -40,14 +40,19 @@ See [README's Environment Setup](../README.en.md#environment-setup)
 
 **Python 3.8+**
 
-- Windows: download and install from [python.org](https://www.python.org/downloads/), and check
-  **Add python.exe to PATH**.
-- macOS: use the python.org installer, or `brew install python`.
-- Linux: `sudo apt install python3 python3-pip` (or the equivalent for your distribution).
-
+- Windows: download and install from [python.org](https://www.python.org/downloads/), and check **Add python.exe to PATH**.
+- macOS: use the python.org installer, or
+  ```bash
+  brew install python
+  ```
+- Linux:
+  ```bash
+  sudo apt install python3 python3-pip # or the equivalent for your distribution
+  ```
 The command name may be `python3`: replace `python` below with `python3`, and when using Make write
-`make debug-setup PYTHON=python3`.
-
+  ```bash
+  make debug-setup PYTHON=python3
+  ```
 **pyOCD**
 
 ```bash
@@ -60,14 +65,12 @@ On Linux, if the probe is not found or permission is denied, configure udev rule
 **VSCode**
 
 Install from [code.visualstudio.com](https://code.visualstudio.com/). After opening this project,
-`.vscode/extensions.json` will prompt you to install the recommended extensions; you can also install
+.vscode/extensions.json will prompt you to install the recommended extensions; you can also install
 `ms-vscode.cpptools` and `marus25.cortex-debug` manually, then reload the window.
 
 **Git for Windows**
 
-Download and install from [git-scm.com](https://git-scm.com/download/win), keeping the default path
-`C:\Program Files\Git` (the build tasks run through its `bin\bash.exe`); if installed elsewhere,
-change `shell.executable` in `.vscode/tasks.json`.
+Download and install from [git-scm.com](https://git-scm.com/download/win), keeping the default path C:\Program Files\Git (the build tasks run through its bin\bash.exe); if installed elsewhere, change `shell.executable` in .vscode/tasks.json.
 
 **curl (optional)**
 
@@ -97,7 +100,7 @@ In the project directory, or after opening VSCode from that directory, run in a 
 make debug-setup        # Windows: mingw32-make debug-setup
 ```
 
-The script downloads and verifies `GigaDevice.GD32F30x_DFP 2.6.0` and extracts all SVDs from the pack into `svd/`.
+The script downloads and verifies GigaDevice.GD32F30x_DFP 2.6.0 and extracts all SVDs from the pack into svd/.
 Repeated runs have no side effects. Details in [Device Pack and SVD](#device-pack-and-svd).
 
 ### 2. Switch device
@@ -108,31 +111,28 @@ First decide on the device, then in the project directory, or after opening VSCo
 make select-device DEVICE=GD32F303VC    # replace with the device you actually use
 ```
 
-The script reads the device pack and updates the Makefile's density macro, startup file and linker script, while syncing
-`.vscode/launch.json`, `.vscode/c_cpp_properties.json` and the selected SVD in `svd/`.
+The script reads the device pack and updates the Makefile's density macro, startup file and linker script, while syncing .vscode/launch.json, .vscode/c_cpp_properties.json and the selected SVD in svd/.
 You can also run it when the device is unchanged, to confirm the configuration is consistent. Details in [Automatic Device Switching](#automatic-device-switching).
 
 ### 3. Build
 
-The bundled `.vscode/tasks.json` binds the default build action to `Ctrl+Shift+B`;
+The bundled .vscode/tasks.json binds the default build action to `Ctrl+Shift+B`;
 in VSCode press `Ctrl+Shift+B`, or from the command line:
 
 ```bash
 make            # Windows: mingw32-make
 ```
 
-Outputs are `build/<TARGET>.elf`, `.hex`, `.bin`. Details of the build task are in
-[VSCode Project Configuration](#vscode-project-configuration).
+Outputs are build/<TARGET>.elf .hex .bin. Details of the build task are in [VSCode Project Configuration](#vscode-project-configuration).
 
 Use the clean command to remove artifacts:
-
 ```bash
 make clean           # Windows: mingw32-make clean
 ```
 
 ### 4. Flash and debug
 
-The bundled `.vscode/launch.json` binds debugging to `F5`; with a PWLINK2 probe connected, press `F5` in VSCode to start Cortex-Debug + pyOCD; after pausing you can inspect core registers and
+The bundled .vscode/launch.json binds debugging to `F5`; with a PWLINK2 probe connected, press `F5` in VSCode to start Cortex-Debug + pyOCD; after pausing you can inspect core registers and
 peripheral registers. You can also flash from the command line first:
 
 ```bash
@@ -153,19 +153,17 @@ pyOCD needs the GD32F30x device pack for the memory map, Flash algorithms and SV
 packs/GigaDevice.GD32F30x_DFP.2.6.0.pack
 ```
 
-> **License notice**: this DFP is licensed by GigaDevice under **SLA-GD0006-version1.1**
-> (see [the Addon repository's LICENSE](https://github.com/GigaDevice-GD32-MCU/GD32F30x_Addon/blob/main/LICENSE));
-> it may only be used for development with GigaDevice chips and redistribution is prohibited. Downloading or using the pack means accepting that agreement.
-> Do not commit `packs/` or `svd/` to a repository, and do not forward them in the project archive; this repository does not contain
-> the device pack and does not distribute the SVDs extracted from it.
+> **License notice**: this DFP is licensed by GigaDevice under **SLA-GD0006-version1.1** (see [the Addon repository's LICENSE](https://github.com/GigaDevice-GD32-MCU/GD32F30x_Addon/blob/main/LICENSE)),
+> it may only be used for development with GigaDevice chips, and redistribution is prohibited. Downloading or using the pack means accepting that agreement.
+> packs/ and svd/ must not be committed to a repository, and must not be forwarded in the project archive; this repository does not contain the device pack and does not distribute the SVDs extracted from it.
 
 #### fetch_pack.py: download, verify and extract all SVDs
 
 The script will:
 
-1. Download `GigaDevice.GD32F30x_DFP.2.6.0.pack` from GigaDevice's `GD32F30x_Addon` repository;
+1. Download GigaDevice.GD32F30x_DFP.2.6.0.pack from GigaDevice's GD32F30x_Addon repository;
 2. Verify the SHA-256 (also checking zip integrity and the version declared in the PDSC);
-3. Extract all `SVD/*.svd` from the pack into `svd/`;
+3. Extract all SVD/*.svd from the pack into svd/;
 4. Skip the download if the file already exists and passes verification; repeated runs have no side effects.
 
 ```bash
@@ -182,7 +180,7 @@ On systems that only provide `python3`, replace `python` with `python3`; when us
 | `--force` | Overwrite files that exist but fail verification |
 | `--url URL` | Use a mirror or another download source |
 | `--dest PATH` | Specify where to save the pack |
-| `--svd-dir DIR` | Specify the SVD output directory (default `svd/`) |
+| `--svd-dir DIR` | Specify the SVD output directory (default svd/) |
 | `--no-svd` | Only download and verify the pack, do not extract SVDs |
 
 #### Manually downloading the pack
@@ -193,8 +191,8 @@ The script is not required. You can also download manually and let the script ve
   <https://github.com/GigaDevice-GD32-MCU/GD32F30x_Addon/tree/main/Keil/Keil5>
 - Direct link:
   <https://raw.githubusercontent.com/GigaDevice-GD32-MCU/GD32F30x_Addon/main/Keil/Keil5/GigaDevice.GD32F30x_DFP.2.6.0.pack>
-- Save as: `packs/GigaDevice.GD32F30x_DFP.2.6.0.pack`
-- Then run `python tools/fetch_pack.py` once to verify it and extract all SVDs.
+- Save as: packs/GigaDevice.GD32F30x_DFP.2.6.0.pack
+- Then run python tools/fetch_pack.py once to verify it and extract all SVDs.
 
 Command-line download:
 
@@ -212,23 +210,23 @@ ef90301be96d0607cf3ed46742d9b08a68ad7e4b07b2259b5f9062d45feabe78
 
 #### About SVDs
 
-- `make debug-setup` extracts all `SVD/*.svd` from the pack into `svd/`;
-- which one is currently used for debugging is determined by `svdFile` in `launch.json`;
-- `svd/` does not participate in compilation and is not distributed with the repository.
+- `make debug-setup` extracts all SVD/*.svd from the pack into svd/;
+- which one is currently used for debugging is determined by `svdFile` in launch.json;
+- svd/ does not participate in compilation and is not distributed with the repository.
 
 ### Automatic Device Switching
 
-`select_device.py` reads device attributes from the pack's PDSC device database and automatically updates:
+select_device.py reads device attributes from the pack's PDSC device database and automatically updates:
 
 | File | What is changed |
 |------|-----------------|
-| `Makefile` | `C_DEFS` density macro, startup file, `LDSCRIPT` (`TARGET` is not changed) |
-| `.vscode/launch.json` | `executable`, `targetId`, `svdFile` |
-| `.vscode/c_cpp_properties.json` | Configuration name, density macro |
-| `svd/` | SVD for the selected device; extracted from the pack if missing |
+| Makefile | `C_DEFS` density macro, startup file, `LDSCRIPT` (`TARGET` is not changed) |
+| .vscode/launch.json | `executable`, `targetId`, `svdFile` |
+| .vscode/c_cpp_properties.json | Configuration name, density macro |
+| svd/ | SVD for the selected device; extracted from the pack if missing |
 
-The Makefile changes directly determine the firmware; `.vscode/` and the SVD only affect the editing and debugging experience.
-If you don't want the script to modify `.vscode/`, apply only the Makefile part manually (see
+The Makefile changes directly determine the firmware; .vscode/ and the SVD only affect the editing and debugging experience.
+If you don't want the script to modify .vscode/, apply only the Makefile part manually (see
 [the README's manual flow](../README.en.md#switching-mcu--board-manual)).
 
 ```bash
@@ -240,9 +238,9 @@ python tools/select_device.py GD32F303VE --pack path/to/dfp.pack
 make select-device DEVICE=GD32F303VE
 ```
 
-- `--list`: list devices with their `define`, Flash size and SVD;
+- `--list`: list devices with their define, Flash size and SVD;
 - `--dry-run`: only print the changes that would be made, write nothing;
-- `--pack`: specify the pack path (defaults to 2.6.0 under `packs/`).
+- `--pack`: specify the pack path (defaults to 2.6.0 under packs/).
 
 Rebuild after switching:
 
@@ -250,8 +248,8 @@ Rebuild after switching:
 make clean && make        # Windows: mingw32-make clean && mingw32-make
 ```
 
-For devices whose PDSC declares no `compile`/`debug` (currently GD32F305/307), the density class is inferred from
-Flash size, and the output notes `inferred from flash size`. For the equivalent manual steps see
+For devices whose PDSC declares no compile/debug (currently GD32F305/307), the density class is inferred from
+Flash size, and the output notes inferred from flash size. For the equivalent manual steps see
 [the README's "Switching MCU / Board (Manual)"](../README.en.md#switching-mcu--board-manual).
 
 ### VSCode Project Configuration
@@ -260,12 +258,12 @@ Flash size, and the output notes `inferred from flash size`. For the equivalent 
 
 The repository commits only cross-platform project-level configuration:
 
-- `tasks.json`: build, clean, show size;
-- `c_cpp_properties.json`: IntelliSense header paths and macros;
-- `extensions.json`: recommended extensions `ms-vscode.cpptools`, `marus25.cortex-debug`;
-- `launch.json`: Cortex-Debug + pyOCD debug configuration.
+- tasks.json: build, clean, show size;
+- c_cpp_properties.json: IntelliSense header paths and macros;
+- extensions.json: recommended extensions ms-vscode.cpptools, marus25.cortex-debug;
+- launch.json: Cortex-Debug + pyOCD debug configuration.
 
-Personal settings go in `.vscode/settings.json`, which is not version-controlled.
+Personal settings go in .vscode/settings.json, which is not version-controlled.
 
 #### Build tasks
 
@@ -273,9 +271,7 @@ Personal settings go in `.vscode/settings.json`, which is not version-controlled
 - `Ctrl+Shift+P` → `Tasks: Run Task`: `rebuild` / `clean` / `size`;
 - Build errors appear in the Problems panel (`$gcc` problem matcher).
 
-Tasks switch automatically by platform: `make` on Linux/macOS, and `mingw32-make` on Windows executed through
-Git Bash. On Windows the default assumes Git is installed at `C:\Program Files\Git`
-(via `${env:ProgramFiles}`); if installed elsewhere, change `shell.executable` in `.vscode/tasks.json`.
+Tasks switch automatically by platform: `make` on Linux/macOS, and `mingw32-make` on Windows executed through Git Bash. On Windows the default assumes Git is installed at C:\Program Files\Git (via `${env:ProgramFiles}`); if installed elsewhere, change `shell.executable` in .vscode/tasks.json.
 
 #### IntelliSense
 
@@ -285,9 +281,7 @@ Git Bash. On Windows the default assumes Git is installed at `C:\Program Files\G
 - `name`: the current device name;
 - `defines`: `USE_STDPERIPH_DRIVER` and the density macro, e.g. `GD32F30X_HD`.
 
-When switching devices manually, besides the Makefile you must also sync the density macro here; otherwise the editor
-will parse peripheral headers as the wrong device (bogus errors, wrong completions). Running `select_device.py` syncs it
-automatically (see [Automatic Device Switching](#automatic-device-switching)).
+When switching devices manually, besides the Makefile you must also sync the density macro here; otherwise the editor will parse peripheral headers as the wrong device (bogus errors, wrong completions). Running select_device.py syncs it automatically (see [Automatic Device Switching](#automatic-device-switching)).
 
 ### Flashing
 
@@ -298,7 +292,7 @@ pyocd flash --pack packs/GigaDevice.GD32F30x_DFP.2.6.0.pack \
             -t gd32f303vc build/aaa_generic_project_name.elf
 ```
 
-`-t` is pyOCD's targetId; change it to the lowercase device name when switching devices.
+`-t` is pyOCD's targetId; change it to the corresponding lowercase device name when switching devices.
 The artifact name comes from `TARGET` in the Makefile; update the path here if you rename it.
 
 #### Other debuggers
@@ -314,8 +308,7 @@ JLinkExe -device GD32F303VC -if SWD -speed 4000
 
 ### Debugging
 
-VSCode debugs with Cortex-Debug + pyOCD (`F5`). `extensions.json` recommends installing
-`marus25.cortex-debug`, and `launch.json` is already configured with:
+VSCode debugs with Cortex-Debug + pyOCD. extensions.json recommends installing marus25.cortex-debug, and launch.json is already configured with:
 
 ```json
 "cmsisPack": "${workspaceFolder}/packs/GigaDevice.GD32F30x_DFP.2.6.0.pack",
@@ -329,9 +322,7 @@ Press `F5` to start debugging; after pausing you can view:
 - CORTEX REGISTERS: core registers;
 - CORTEX PERIPHERALS: peripheral registers, read from the SVD referenced by `svdFile`.
 
-When switching devices, update `targetId` and `svdFile` in `launch.json`, or run
-`select_device.py` to handle it automatically (see [Automatic Device Switching](#automatic-device-switching)). The 2.6.0 pack
-covers the whole GD32F30x series.
+When switching devices, update `targetId` and `svdFile` in launch.json, or run select_device.py to handle it automatically (see [Automatic Device Switching](#automatic-device-switching)). The 2.6.0 pack covers the whole GD32F30x series.
 
 ## Changing the Probe
 
@@ -343,7 +334,7 @@ firmware does not need to be rebuilt.
 
 | New probe | Configuration changes |
 |-----------|-----------------------|
-| Another CMSIS-DAP compatible probe (DAP-Link, GD-Link, etc.) | pyOCD usually detects it directly; only change `name` in `launch.json` |
+| Another CMSIS-DAP compatible probe (DAP-Link, GD-Link, etc.) | pyOCD usually detects it directly; only change `name` in launch.json |
 | J-Link | Change `servertype` and `device`, remove pyOCD-specific fields |
 | ST-Link | Use `stutil` or switch to OpenOCD |
 | Anything else | Use OpenOCD and configure `configFiles` |
@@ -422,17 +413,14 @@ correctly; specify them manually if needed.
 ### GD32-specific considerations
 
 - **SWD pin reuse**: if the firmware configures `PA13`/`PA14` as plain GPIO, the probe may fail to attach after reset.
-  Use "connect under reset" and make sure `NRST` is connected.
-- **Readout protection/option bytes**: if the chip was locked by another tool, the new tool will request an unlock or a
-  full-chip erase. A full erase wipes the existing firmware, so confirm before proceeding.
+  Use "connect under reset", and make sure `NRST` is connected.
+- **Readout protection/option bytes**: if the chip was locked by another tool, the new tool will request an unlock or a full-chip erase. A full erase wipes the existing firmware, so confirm before proceeding.
 - **BOOT0**: booting from flash requires BOOT0 to be low.
-- **Low power**: the FreeRTOS idle task enters WFI, which normally does not affect SWD. If attaching is unreliable, try
-  "connect under reset" first and lower the clock.
+- **Low power**: the FreeRTOS idle task enters WFI, which normally does not affect SWD. If attaching is unreliable, try "connect under reset" first and lower the clock.
 
 ### Speed and verification
 
-Start at a low speed (1–2 MHz) and increase it gradually. Speed settings: `serverArgs: ["-f", "1M"]` for pyOCD,
-`-speed 1000` for J-Link, and `adapter speed` for OpenOCD.
+Start at a low speed (1–2 MHz) and increase it gradually. Speed settings: pyOCD uses `serverArgs: ["-f", "1M"]`, J-Link uses `-speed 1000`, and OpenOCD uses `adapter speed`.
 
 Verify in this order:
 
@@ -443,12 +431,10 @@ pyocd flash --pack packs/GigaDevice.GD32F30x_DFP.2.6.0.pack \
 pyocd reset                         # confirm the program is running
 ```
 
-Then press `F5`, set a breakpoint in `main`, and confirm you can pause, single-step, and read peripheral registers in
-CORTEX PERIPHERALS.
+Then press `F5`, set a breakpoint in main, and confirm you can pause, single-step, and read peripheral registers in `CORTEX PERIPHERALS`.
 
 ### Documentation to update after a permanent change
 
 - The `name`, `servertype`, `device` and related fields in [.vscode/launch.json](../.vscode/launch.json);
-- The hardware note in [Environment Setup](#environment-setup), and the commands and descriptions in
-  [Flashing](#flashing) and [Debugging](#debugging);
+- The hardware note in [Environment Setup](#environment-setup), and the commands and descriptions in [Flashing](#flashing) and [Debugging](#debugging);
 - The command-line flashing examples (`pyocd flash` / `JLinkExe` / `openocd`).

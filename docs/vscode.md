@@ -3,12 +3,12 @@
 # 可选：VSCode 编程与调试平台
 
 > **可选内容**：本页把 VSCode 工程配置、器件包、烧录调试和型号切换脚本集中在一起。
-> 固件构建只依赖 `arm-none-eabi-gcc` + GNU Make；`.vscode/`、`tools/`、`packs/`、`svd/`
-> 都不参与 `make`，删除或跳过它们不影响固件产物。
 >
-> 不依赖 VSCode 和脚本的手动换型号流程，见
-> [README 的「换芯片 / 改板（手动）」](../README.md#换芯片--改板手动)。
-> `packs/`、`svd/` 都不入库，也不要随工程压缩包转发。
+> 固件构建只依赖 arm-none-eabi-gcc + GNU Make；.vscode/、tools/、packs/、svd/ 都不参与 make，删除或跳过它们不影响固件产物。
+>
+> 不依赖 VSCode 和脚本的手动换型号流程，见 [README 的「换芯片 / 改板（手动）」](../README.md#换芯片--改板手动)。
+>
+> packs/、svd/ 都不入库，也不要随工程压缩包转发。
 
 ## 环境准备
 
@@ -18,7 +18,7 @@
 |------|------|------|
 | ARM GNU Toolchain | 交叉编译 | 见 [README 的环境准备](../README.md#环境准备) |
 | GNU Make | 构建 | 见 [README 的环境准备](../README.md#环境准备) |
-| Python 3.8+ | 运行 `tools/` 下的`.py`脚本 | 命令可能是 `python` 或 `python3`，下文统一写 `python` |
+| Python 3.8+ | 运行 tools/ 下的 .py 脚本 | 命令可能是 `python` 或 `python3`，下文统一写 `python` |
 | pyOCD | 烧录与调试 | 通过 Python 安装，见下方命令 |
 | VSCode | 编辑器 | 主要编程和调试窗口 |
 | ms-vscode.cpptools | C/C++ 语法识别 | 是 VSCode 的扩展（插件） |
@@ -26,7 +26,7 @@
 | Git for Windows | 便捷执行make构建任务（仅 Windows） | VSCode for windows 默认终端经常识别不到环境变量，改用 Git 自带的 bash |
 | curl | 手动下载器件包（可选） | 不用脚本下载时使用，见「手动下载 pack」 |
 
-硬件：PWLINK2 调试探针（兼容 CMSIS-DAP，pyOCD 可直接识别）。
+硬件：本工程使用 PWLINK2 调试探针（兼容 CMSIS-DAP，pyOCD 可直接识别）。
 
 ### 安装方法
 
@@ -40,14 +40,19 @@
 
 **Python 3.8+**
 
-- Windows：从 [python.org](https://www.python.org/downloads/) 下载安装，勾选
-  **Add python.exe to PATH**。
-- macOS：用 python.org 安装包，或 `brew install python`。
-- Linux：`sudo apt install python3 python3-pip`（或发行版等价命令）。
-
+- Windows：从 [python.org](https://www.python.org/downloads/) 下载安装，勾选 **Add python.exe to PATH**。
+- macOS：用 python.org 安装包，或
+  ```bash
+  brew install python
+  ```
+- Linux：
+  ```bash
+  sudo apt install python3 python3-pip # 或发行版等价命令
+  ```
 命令名可能是 `python3`：把下文的 `python` 换成 `python3` 即可，用 Make 时写
-`make debug-setup PYTHON=python3`。
-
+  ```bash
+  make debug-setup PYTHON=python3
+  ```
 **pyOCD**
 
 ```bash
@@ -60,14 +65,12 @@ Linux 下如果提示找不到探针或没有权限，参考
 **VSCode**
 
 从 [code.visualstudio.com](https://code.visualstudio.com/) 安装。打开本工程后，
-`.vscode/extensions.json` 会提示安装推荐扩展；也可以手动安装
+.vscode/extensions.json 会提示安装推荐扩展；也可以手动安装
 `ms-vscode.cpptools` 和 `marus25.cortex-debug`，装完重新加载窗口。
 
 **Git for Windows**
 
-从 [git-scm.com](https://git-scm.com/download/win) 下载安装，保持默认路径
-`C:\Program Files\Git`（构建任务通过其中的 `bin\bash.exe` 执行）；装在别处时
-修改 `.vscode/tasks.json` 中的 `shell.executable`。
+从 [git-scm.com](https://git-scm.com/download/win) 下载安装，保持默认路径 C:\Program Files\Git（构建任务通过其中的 bin\bash.exe 执行）；装在别处时修改 .vscode/tasks.json 中的 `shell.executable`。
 
 **curl（可选）**
 
@@ -97,7 +100,7 @@ pyocd --version
 make debug-setup        # Windows: mingw32-make debug-setup
 ```
 
-脚本会下载并校验 `GigaDevice.GD32F30x_DFP 2.6.0`，把包内全部 SVD 解到 `svd/`。
+脚本会下载并校验 GigaDevice.GD32F30x_DFP 2.6.0，把包内全部 SVD 解到 svd/。
 重复执行没有副作用。细节见[器件包与 SVD](#器件包与-svd)。
 
 ### 2. 切换型号
@@ -108,31 +111,28 @@ make debug-setup        # Windows: mingw32-make debug-setup
 make select-device DEVICE=GD32F303VC    # 换成你实际使用的型号
 ```
 
-脚本会读取器件包，更新 Makefile 的容量宏、启动文件和链接脚本，同时同步
-`.vscode/launch.json`、`.vscode/c_cpp_properties.json` 和 `svd/` 中选定的 SVD。
+脚本会读取器件包，更新 Makefile 的容量宏、启动文件和链接脚本，同时同步 .vscode/launch.json、.vscode/c_cpp_properties.json 和 svd/ 中选定的 SVD。
 型号不变时也可以运行，用来确认配置一致。细节见[自动切换型号](#自动切换型号)。
 
 ### 3. 编译
 
-随附的 `.vscode/tasks.json` 已将默认编译操作绑定到 `Ctrl+Shift+B`；
+随附的 .vscode/tasks.json 已将默认编译操作绑定到 `Ctrl+Shift+B`；
 VSCode 中按 `Ctrl+Shift+B`，或命令行：
 
 ```bash
 make            # Windows: mingw32-make
 ```
 
-产物在 `build/<TARGET>.elf`、`.hex`、`.bin`。编译任务的细节见
-[VSCode 工程配置](#vscode-工程配置)。
+产物在 build/<TARGET>.elf .hex .bin。编译任务的细节见 [VSCode 工程配置](#vscode-工程配置)。
 
 使用清除命令移除产物：
-
 ```bash
 make clean           # Windows: mingw32-make clean
 ```
 
 ### 4. 烧录与调试
 
-随附的 `.vscode/launch.json` 已将调试操作绑定到 `F5`；连接 PWLINK2 烧录器后，VSCode 中按 `F5` 启动 Cortex-Debug + pyOCD；暂停后可查看内核寄存器和
+随附的 .vscode/launch.json 已将调试操作绑定到 `F5`；连接 PWLINK2 烧录器后，VSCode 中按 `F5` 启动 Cortex-Debug + pyOCD；暂停后可查看内核寄存器和
 外设寄存器。也可以先用命令行烧录：
 
 ```bash
@@ -153,20 +153,17 @@ pyOCD 需要 GD32F30x 器件包来获得内存布局、Flash 算法和 SVD。本
 packs/GigaDevice.GD32F30x_DFP.2.6.0.pack
 ```
 
-> **许可提示**：该 DFP 由兆易创新以 **SLA-GD0006-version1.1** 授权
-> （见 [Addon 仓库的 LICENSE](https://github.com/GigaDevice-GD32-MCU/GD32F30x_Addon/blob/main/LICENSE)），
+> **许可提示**：该 DFP 由兆易创新以 **SLA-GD0006-version1.1** 授权 （见 [Addon 仓库的 LICENSE](https://github.com/GigaDevice-GD32-MCU/GD32F30x_Addon/blob/main/LICENSE)），
 > 仅允许配合兆易芯片用于开发，并禁止再分发。下载或使用该包即表示接受该协议。
-> `packs/` 与 `svd/` 都不要提交到仓库、也不要随工程压缩包转发；本仓库不包含
-> 该器件包，也不分发由它解出的 SVD。
+> packs/ 与 svd/ 都不要提交到仓库、也不要随工程压缩包转发；本仓库不包含 该器件包，也不分发由它解出的 SVD。
 
 #### fetch_pack.py：下载、校验并解出全部 SVD
 
 脚本会：
 
-1. 从 GigaDevice 的 `GD32F30x_Addon` 仓库下载
-   `GigaDevice.GD32F30x_DFP.2.6.0.pack`；
+1. 从 GigaDevice 的 GD32F30x_Addon 仓库下载 GigaDevice.GD32F30x_DFP.2.6.0.pack；
 2. 校验 SHA-256（同时检查 zip 完整性和 PDSC 的版本声明）；
-3. 把包内全部 `SVD/*.svd` 解到 `svd/`；
+3. 把包内全部 SVD/*.svd 解到 svd/；
 4. 已存在且校验通过时跳过下载，重复执行没有副作用。
 
 ```bash
@@ -183,7 +180,7 @@ make debug-setup            # Windows: mingw32-make debug-setup
 | `--force` | 覆盖已存在但校验不通过的文件 |
 | `--url URL` | 改用镜像或其他下载源 |
 | `--dest PATH` | 指定 pack 保存路径 |
-| `--svd-dir DIR` | 指定 SVD 输出目录（默认 `svd/`） |
+| `--svd-dir DIR` | 指定 SVD 输出目录（默认 svd/） |
 | `--no-svd` | 只下载并校验 pack，不解 SVD |
 
 #### 手动下载 pack
@@ -194,8 +191,8 @@ make debug-setup            # Windows: mingw32-make debug-setup
   <https://github.com/GigaDevice-GD32-MCU/GD32F30x_Addon/tree/main/Keil/Keil5>
 - 直接链接：
   <https://raw.githubusercontent.com/GigaDevice-GD32-MCU/GD32F30x_Addon/main/Keil/Keil5/GigaDevice.GD32F30x_DFP.2.6.0.pack>
-- 保存为：`packs/GigaDevice.GD32F30x_DFP.2.6.0.pack`
-- 然后运行一次 `python tools/fetch_pack.py`，校验并解出全部 SVD。
+- 保存为：packs/GigaDevice.GD32F30x_DFP.2.6.0.pack
+- 然后运行一次 python tools/fetch_pack.py，校验并解出全部 SVD。
 
 命令行下载：
 
@@ -213,9 +210,9 @@ ef90301be96d0607cf3ed46742d9b08a68ad7e4b07b2259b5f9062d45feabe78
 
 #### SVD 说明
 
-- `make debug-setup` 会把包内全部 `SVD/*.svd` 解到 `svd/`；
-- 当前调试使用哪一个由 `launch.json` 的 `svdFile` 决定；
-- `svd/` 不参与编译，也不随仓库分发。
+- `make debug-setup` 会把包内全部 SVD/*.svd 解到 svd/；
+- 当前调试使用哪一个由 launch.json 的 `svdFile` 决定；
+- svd/ 不参与编译，也不随仓库分发。
 
 ### 自动切换型号
 
@@ -223,13 +220,13 @@ ef90301be96d0607cf3ed46742d9b08a68ad7e4b07b2259b5f9062d45feabe78
 
 | 文件 | 修改内容 |
 |------|----------|
-| `Makefile` | `C_DEFS` 容量宏、启动文件、`LDSCRIPT`（不改 `TARGET`） |
-| `.vscode/launch.json` | `executable`、`targetId`、`svdFile` |
-| `.vscode/c_cpp_properties.json` | 配置名、容量等级宏 |
-| `svd/` | 选定型号的 SVD；缺失时从 pack 补解 |
+| Makefile | `C_DEFS` 容量宏、启动文件、`LDSCRIPT`（不改 `TARGET`） |
+| .vscode/launch.json | `executable`、`targetId`、`svdFile` |
+| .vscode/c_cpp_properties.json | 配置名、容量等级宏 |
+| svd/ | 选定型号的 SVD；缺失时从 pack 补解 |
 
-Makefile 的修改直接决定固件；`.vscode/` 和 SVD 只影响编辑器与调试体验。
-如果不想让脚本改动 `.vscode/`，只手动应用 Makefile 部分即可（见
+Makefile 的修改直接决定固件；.vscode/ 和 SVD 只影响编辑器与调试体验。
+如果不想让脚本改动 .vscode/，只手动应用 Makefile 部分即可（见
 [README 的手动流程](../README.md#换芯片--改板手动)）。
 
 ```bash
@@ -241,9 +238,9 @@ python tools/select_device.py GD32F303VE --pack path/to/dfp.pack
 make select-device DEVICE=GD32F303VE
 ```
 
-- `--list`：列出型号及其 `define`、Flash 大小、SVD；
+- `--list`：列出型号及其 define、Flash 大小、SVD；
 - `--dry-run`：只打印将要做的修改，不写文件；
-- `--pack`：指定 pack 路径（默认用 `packs/` 下的 2.6.0）。
+- `--pack`：指定 pack 路径（默认用 packs/ 下的 2.6.0）。
 
 切换后重新编译：
 
@@ -251,8 +248,8 @@ make select-device DEVICE=GD32F303VE
 make clean && make        # Windows: mingw32-make clean && mingw32-make
 ```
 
-PDSC 中未声明 `compile`/`debug` 的型号（目前是 GD32F305/307）会按 Flash 容量
-推断容量等级，输出中会注明 `inferred from flash size`。手动切换的等价步骤见
+PDSC 中未声明 compile/debug 的型号（目前是 GD32F305/307）会按 Flash 容量
+推断容量等级，输出中会注明 inferred from flash size。手动切换的等价步骤见
 [README 的「换芯片 / 改板（手动）」](../README.md#换芯片--改板手动)。
 
 ### VSCode 工程配置
@@ -261,12 +258,12 @@ PDSC 中未声明 `compile`/`debug` 的型号（目前是 GD32F305/307）会按 
 
 仓库只提交跨平台的工程级配置：
 
-- `tasks.json`：编译、清理、查看大小；
-- `c_cpp_properties.json`：IntelliSense 头文件路径与宏；
-- `extensions.json`：推荐扩展 `ms-vscode.cpptools`、`marus25.cortex-debug`；
-- `launch.json`：Cortex-Debug + pyOCD 调试配置。
+- tasks.json：编译、清理、查看大小；
+- c_cpp_properties.json：IntelliSense 头文件路径与宏；
+- extensions.json：推荐扩展 ms-vscode.cpptools、marus25.cortex-debug；
+- launch.json：Cortex-Debug + pyOCD 调试配置。
 
-个人设置放在 `.vscode/settings.json`，该文件不纳入版本控制。
+个人设置放在 .vscode/settings.json，该文件不纳入版本控制。
 
 #### 编译任务
 
@@ -274,10 +271,7 @@ PDSC 中未声明 `compile`/`debug` 的型号（目前是 GD32F305/307）会按 
 - `Ctrl+Shift+P` → `Tasks: Run Task`：`rebuild` / `clean` / `size`；
 - 编译错误会进入 Problems 面板（`$gcc` 问题匹配器）。
 
-任务按平台自动切换：Linux/macOS 用 `make`，Windows 用 `mingw32-make` 并通过
-Git Bash 执行。Windows 下默认假定 Git 安装在 `C:\Program Files\Git`
-（通过 `${env:ProgramFiles}` 获取）；装在别处时修改 `.vscode/tasks.json`
-中的 `shell.executable`。
+任务按平台自动切换：Linux/macOS 用 `make`，Windows 用 `mingw32-make` 并通过 Git Bash 执行。Windows 下默认假定 Git 安装在 C:\Program Files\Git （通过 `${env:ProgramFiles}` 获取）；装在别处时修改 .vscode/tasks.json中的 `shell.executable`。
 
 #### IntelliSense
 
@@ -287,9 +281,7 @@ Git Bash 执行。Windows 下默认假定 Git 安装在 `C:\Program Files\Git`
 - `name`：当前型号名；
 - `defines`：`USE_STDPERIPH_DRIVER` 和容量等级宏，如 `GD32F30X_HD`。
 
-手动换型号时，除了改 Makefile，还要同步这里的容量宏，否则编辑器会按错误型号
-解析外设头文件（出现假报错、错误的补全）。运行 `select_device.py` 会自动同步
-（见[自动切换型号](#自动切换型号)）。
+手动换型号时，除了改 Makefile，还要同步这里的容量宏，否则编辑器会按错误型号解析外设头文件（出现假报错、错误的补全）。运行 select_device.py 会自动同步 （见[自动切换型号](#自动切换型号)）。
 
 ### 烧录
 
@@ -316,35 +308,30 @@ JLinkExe -device GD32F303VC -if SWD -speed 4000
 
 ### 调试
 
-VSCode 使用 Cortex-Debug + pyOCD 调试（F5）。`extensions.json` 推荐安装
-`marus25.cortex-debug`，`launch.json` 已配置：
+VSCode 使用 Cortex-Debug + pyOCD 调试。extensions.json 推荐安装 marus25.cortex-debug，launch.json 已配置：
 
 ```json
 "cmsisPack": "${workspaceFolder}/packs/GigaDevice.GD32F30x_DFP.2.6.0.pack",
 ```
 
-Cortex-Debug 会把它转成 `pyocd gdbserver --pack ...`，因此不需要
-`pyocd pack install`，也不要求 pyOCD 的 pack 索引里存在 2.6.0。
+Cortex-Debug 会把它转成 `pyocd gdbserver --pack ...`，因此不需要 `pyocd pack install`，也不要求 pyOCD 的 pack 索引里存在 2.6.0。
 
 按 `F5` 启动调试；暂停后可查看：
 
 - CORTEX REGISTERS：内核寄存器；
 - CORTEX PERIPHERALS：外设寄存器，读取 `svdFile` 指向的 SVD。
 
-换型号时同步修改 `launch.json` 的 `targetId` 和 `svdFile`，或者运行
-`select_device.py` 自动处理（见[自动切换型号](#自动切换型号)）。2.6.0 的 pack
-覆盖 GD32F30x 全系列。
+换型号时同步修改 launch.json 的 `targetId` 和 `svdFile`，或者运行 select_device.py 自动处理（见[自动切换型号](#自动切换型号)）。2.6.0 的 pack覆盖 GD32F30x 全系列。
 
 ## 更换烧录器
 
-默认配置以 PWLINK2（CMSIS-DAP 兼容）配合 pyOCD 为例。更换烧录器只影响烧录和调试
-通道；`make` 构建、链接脚本和容量宏都不依赖探针，固件产物不需要重新编译。
+默认配置以 PWLINK2（CMSIS-DAP 兼容）配合 pyOCD 为例。更换烧录器只影响烧录和调试通道；`make` 构建、链接脚本和容量宏都不依赖探针，固件产物不需要重新编译。
 
 ### 先确认探针类型
 
 | 新烧录器 | 配置改动 |
 |----------|----------|
-| 其他 CMSIS-DAP 兼容探针（DAP-Link、GD-Link 等） | pyOCD 一般能直接识别，`launch.json` 只需改 `name` |
+| 其他 CMSIS-DAP 兼容探针（DAP-Link、GD-Link 等） | pyOCD 一般能直接识别，launch.json 只需改 `name` |
 | J-Link | 改 `servertype`、`device`，删除 pyOCD 专有字段 |
 | ST-Link | 改用 `stutil` 或 OpenOCD |
 | 其他 | 走 OpenOCD，配置 `configFiles` |
@@ -419,18 +406,14 @@ target 配置随 OpenOCD 版本不同，可能只有 `target/stm32f30x.cfg`（�
 
 ### GD32 侧注意事项
 
-- **SWD 引脚复用**：固件若把 `PA13`/`PA14` 配置成普通 GPIO，复位后探针可能连不上。
-  此时使用 "connect under reset"，并确保 `NRST` 已连接。
-- **读保护/选项字节**：芯片被其他工具加过读保护时，新工具会要求解锁或全片擦除，
-  全擦会清除现有固件，操作前确认。
+- **SWD 引脚复用**：固件若把 `PA13`/`PA14` 配置成普通 GPIO，复位后探针可能连不上。此时使用 "connect under reset"，并确保 `NRST` 已连接。
+- **读保护/选项字节**：芯片被其他工具加过读保护时，新工具会要求解锁或全片擦除，全擦会清除现有固件，操作前确认。
 - **BOOT0**：从 Flash 启动要求 BOOT0 为低。
-- **低功耗**：FreeRTOS 空闲任务会进入 WFI，一般不影响 SWD；连接不稳定时优先尝试
-  "connect under reset" 并降低时钟。
+- **低功耗**：FreeRTOS 空闲任务会进入 WFI，一般不影响 SWD；连接不稳定时优先尝试 "connect under reset" 并降低时钟。
 
 ### 速率与验证
 
-先用较低速率（1–2 MHz）跑通，再逐步提高。速率参数：pyOCD 用
-`serverArgs: ["-f", "1M"]`，J-Link 用 `-speed 1000`，OpenOCD 用 `adapter speed`。
+先用较低速率（1–2 MHz）跑通，再逐步提高。速率参数：pyOCD 用 `serverArgs: ["-f", "1M"]`，J-Link 用 `-speed 1000`，OpenOCD 用 `adapter speed`。
 
 按顺序验证：
 
@@ -441,13 +424,10 @@ pyocd flash --pack packs/GigaDevice.GD32F30x_DFP.2.6.0.pack \
 pyocd reset                         # 确认程序在运行
 ```
 
-再按 `F5`，在 `main` 打断点，确认能暂停、单步，并在 CORTEX PERIPHERALS 中读到
-外设寄存器。
+再按 `F5`，在 main 打断点，确认能暂停、单步，并在 `CORTEX PERIPHERALS` 中读到外设寄存器。
 
 ### 长期更换后要同步的文档
 
-- [.vscode/launch.json](../.vscode/launch.json) 的 `name`、`servertype`、`device`
-  等字段；
-- 本页[环境准备](#环境准备)的硬件说明，以及[烧录](#烧录)、[调试](#调试)两节的
-  命令和描述；
+- [.vscode/launch.json](../.vscode/launch.json) 的 `name`、`servertype`、`device`等字段；
+- 本页[环境准备](#环境准备)的硬件说明，以及[烧录](#烧录)、[调试](#调试)两节的命令和描述；
 - 命令行烧录示例（`pyocd flash` / `JLinkExe` / `openocd`）。
