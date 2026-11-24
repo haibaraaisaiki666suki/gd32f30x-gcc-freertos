@@ -1,4 +1,4 @@
-# 下载的 CMSIS-Pack 与本地解出的 SVD（按 README 获取，不入库）
+# Downloaded CMSIS-Pack and locally extracted SVDs (obtain per README, not tracked)
 packs/*.pack
 packs/*.part
 svd/
@@ -16,7 +16,7 @@ __pycache__/
 *.lst
 
 # Editor / OS
-# VSCode：只追踪可移植的工程级配置，个人设置留在本地
+# VSCode: only portable project-level settings are tracked; personal settings stay local
 .vscode/*
 !.vscode/tasks.json
 !.vscode/c_cpp_properties.json

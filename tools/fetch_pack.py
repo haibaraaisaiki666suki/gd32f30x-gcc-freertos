@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""下载并校验 GD32F30x 官方 DFP（CMSIS-Pack），并解出包内全部 SVD。
+"""Download and verify the official GD32F30x DFP (CMSIS-Pack) and extract all SVDs from it.
 
-默认从 GigaDevice 的 GD32F30x_Addon 仓库获取 2.6.0（2025-08-20 发布），
-保存到 packs/GigaDevice.GD32F30x_DFP.2.6.0.pack，并用 SHA-256 校验。
-已存在且校验通过时不重复下载。
+By default the 2.6.0 pack (released 2025-08-20) is fetched from GigaDevice's
+GD32F30x_Addon repository, saved to packs/GigaDevice.GD32F30x_DFP.2.6.0.pack,
+and verified with SHA-256. An existing file that passes verification is not
+downloaded again.
 
-校验通过后从包内解出 SVD/*.svd 到 svd/，供 Cortex-Debug 显示外设寄存器。
-具体型号使用哪个 SVD 由 tools/select_device.py 决定（写入 launch.json 的
-svdFile）。SVD 在本地生成，不纳入版本控制，也不再分发。
+Once verified, the SVD/*.svd files are extracted from the pack into svd/ so
+Cortex-Debug can show peripheral registers. Which SVD a given part uses is
+decided by tools/select_device.py (written to svdFile in launch.json). The
+SVDs are generated locally, are not tracked by version control, and are not
+redistributed.
 
-许可：该 DFP 按 GigaDevice SLA-GD0006-version1.1 授权（Addon 仓库根
-目录的 LICENSE），仅允许配合兆易芯片用于开发，禁止再分发。
+License: the DFP is licensed under GigaDevice SLA-GD0006-version1.1 (LICENSE
+in the root of the Addon repository). It may only be used for development
+with GigaDevice chips, and redistribution is not permitted.
 
-用法:
+Usage:
     python tools/fetch_pack.py
     python tools/fetch_pack.py --force
     python tools/fetch_pack.py --url https://mirror/... --dest packs/dfp.pack
